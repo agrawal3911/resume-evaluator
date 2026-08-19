@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-multipart
+httpx
+
+PyMuPDF
+python-docx
+pytest
+pydantic[email]
+google-genai
+python-dotenv
+

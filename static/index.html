@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Evaluator | AI-Powered Resume Analysis</title>
+  <meta name="description" content="Upload your resume and job description to get an AI-powered evaluation with detailed skill matching, scoring, and actionable feedback.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+</head>
+<body>
+
+  <!-- Animated Background Orbs -->
+  <div class="bg-decoration">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <h1>Resume Evaluator</h1>
+      </div>
+      <p class="tagline">AI-powered resume analysis &amp; skill matching</p>
+    </header>
+
+    <!-- ==================== INPUT SECTION ==================== -->
+    <section id="input-section" class="section">
+      <div class="input-grid">
+
+        <!-- Upload Card -->
+        <div class="card upload-card">
+          <h2>Upload Resume</h2>
+          <div id="drop-zone" class="drop-zone">
+            <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p>Drag &amp; drop your resume here</p>
+            <span class="separator">or</span>
+            <label for="file-input" class="file-label">Browse Files</label>
+            <input type="file" id="file-input" accept=".pdf,.docx" hidden>
+            <p class="file-hint">Supports .pdf and .docx (max 10 MB)</p>
+          </div>
+          <div id="file-info" class="file-info hidden">
+            <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span id="file-name"></span>
+            <button id="remove-file" class="remove-file-btn" title="Remove file">✕</button>
+          </div>
+        </div>
+
+        <!-- Job Description Card -->
+        <div class="card jd-card">
+          <h2>Job Description</h2>
+          <textarea id="jd-text" placeholder="Paste the complete job description here including required skills, experience, education, and responsibilities..."></textarea>
+        </div>
+
+      </div>
+
+      <button id="evaluate-btn" class="btn-primary" disabled>
+        <span>Evaluate Match</span>
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </section>
+
+    <!-- ==================== LOADING SECTION ==================== -->
+    <section id="loading-section" class="section hidden">
+      <div class="loading-card card">
+        <div class="spinner"></div>
+        <h2>Analyzing Your Resume</h2>
+        <p>Our AI is evaluating your skills, experience, and qualifications...</p>
+        <div class="loading-steps">
+          <div class="loading-step">Parsing document</div>
+          <div class="loading-step">Extracting information</div>
+          <div class="loading-step">Matching skills</div>
+          <div class="loading-step">Generating insights</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ERROR SECTION ==================== -->
+    <section id="error-section" class="section hidden">
+      <div class="error-card card">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        <h2>Something went wrong</h2>
+        <p id="error-message"></p>
+        <button id="retry-btn" class="btn-secondary">← Try Again</button>
+      </div>
+    </section>
+
+    <!-- ==================== RESULTS SECTION ==================== -->
+    <section id="results-section" class="section hidden">
+
+      <!-- Score Overview -->
+      <div class="score-overview card">
+        <div class="gauge-container">
+          <svg id="score-gauge" viewBox="0 0 200 200">
+            <circle class="gauge-bg" cx="100" cy="100" r="70"/>
+            <circle id="gauge-fill" class="gauge-fill" cx="100" cy="100" r="70"/>
+            <text id="score-text" x="100" y="95" class="gauge-score">0</text>
+            <text x="100" y="118" class="gauge-label">out of 100</text>
+          </svg>
+        </div>
+        <div class="score-info">
+          <span id="verdict-badge" class="verdict-badge"></span>
+          <p id="summary-text" class="summary-text"></p>
+        </div>
+      </div>
+
+      <!-- Score Breakdown -->
+      <div class="breakdown-card card">
+        <h3>📊 Score Breakdown</h3>
+        <div id="breakdown-bars" class="breakdown-bars"></div>
+      </div>
+
+      <!-- Skills -->
+      <div class="skills-grid">
+        <div class="card skills-card">
+          <h3>🎯 Required Skills</h3>
+          <div id="required-skills" class="skills-container"></div>
+        </div>
+        <div class="card skills-card">
+          <h3>⭐ Preferred Skills</h3>
+          <div id="preferred-skills" class="skills-container"></div>
+        </div>
+      </div>
+
+      <!-- Strengths & Gaps -->
+      <div class="insights-grid">
+        <div class="card insights-card strengths-card">
+          <h3>💪 Strengths</h3>
+          <ul id="strengths-list"></ul>
+        </div>
+        <div class="card insights-card gaps-card">
+          <h3>🔍 Gaps to Address</h3>
+          <ul id="gaps-list"></ul>
+        </div>
+      </div>
+
+      <!-- Experience & Education -->
+      <div class="detail-grid">
+        <div class="card detail-card">
+          <h3>💼 Experience</h3>
+          <p id="experience-match" class="detail-match"></p>
+          <p id="experience-reasoning" class="detail-reasoning"></p>
+        </div>
+        <div class="card detail-card">
+          <h3>🎓 Education</h3>
+          <p id="education-match" class="detail-match"></p>
+          <p id="education-reasoning" class="detail-reasoning"></p>
+        </div>
+      </div>
+
+      <!-- Final Assessment -->
+      <div class="card final-card">
+        <h3>📋 Final Assessment</h3>
+        <p id="final-reasoning"></p>
+      </div>
+
+      <!-- New Evaluation Button -->
+      <button id="new-eval-btn" class="btn-secondary">← Start New Evaluation</button>
+
+    </section>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
